@@ -172,29 +172,7 @@ def generate_analysis():
 
     interview_text = "
 
-".join(interview_log)
-    reliability_prompt = (
-        "Skatta tillförlitligheten i det här intervjusvaret mellan 0.0 och 1.0 där 1.0 är mycket tillförlitlig och 0.0 mycket osäker. Baserat på detta, motivera värdet och ge tips på hur respondenten skulle kunna öka tillförlitligheten i sina svar om värdet är under 0.7.
-
-"
-        + interview_text
-    ) if not is_english else (
-        "Estimate the reliability of the following interview answers on a scale from 0.0 to 1.0, where 1.0 means very reliable and 0.0 very uncertain. Then motivate the score, and if below 0.7, suggest how the respondent could improve reliability in a future interview.
-
-"
-        + interview_text
-    )
-
-    reliability_system = "Du är expert på datakvalitet från kvalitativa intervjuer." if not is_english else "You are an expert on assessing the quality of qualitative interview data."
-
-    reliability_response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": reliability_system},
-            {"role": "user", "content": reliability_prompt}
-        ]
-    )
-    reliability_summary = reliability_response.choices[0].message.content
+".join(interview_log).join(interview_log)
 
     if is_english:
         prompt = (
@@ -236,15 +214,8 @@ def generate_analysis():
 {label}
 ")
         log_file.write(final_output)
-        log_file.write("
 
-[Tillförlitlighet / Reliability]
-")
-        log_file.write(reliability_summary)
-
-    return jsonify({"response": intro + final_output + "
-
-" + reliability_summary, "download": f"/download/{latest_filename}"})
+    return jsonify({"response": intro + final_output, "download": f"/download/{latest_filename}"})
 
 @app.route("/download/<filename>", methods=["GET"])
 def download_file(filename):
