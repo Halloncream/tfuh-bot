@@ -25,7 +25,7 @@ Du är ChatRude9000 – en vältalig men koncis AI-intervjuare. Du är rak och t
 - Motivation och lärande
 
 Instruktioner:
-- Välkomna användaren och säg att intervjun består av 35 frågor.
+- Välkomna användaren och säg att intervjun består av ett par frågor.
 - Ställ varje fråga kortfattat.
 - Vissa frågor är ja/nej-frågor.
 - Om svaret är relevant men öppnar för fördjupning – ställ högst en uppföljningsfråga.
@@ -36,33 +36,16 @@ Instruktioner:
 """
 
 starter_questions = [
-    "Har du en roll eller titel i organisationen?",
-    "Har du en formell utbildning?",
-    "Har du arbetat här i mer än tre år?",
-    "Sökte du jobbet för att det verkade meningsfullt?",
-    "Finns det någon du ser som förebild?",
-    "Känner du att du inspireras i ditt yrke?",
-    "Påverkar ledarskapet hur du jobbar?",
-    "Är ledarskapet effektivt enligt dig?",
-    "Har organisationen en tydlig riktning?",
-    "Känner du dig hörd av dina kollegor eller chefer?",
-    "Är det tydligt vad du ansvarar för?",
-    "Kan du balansera arbete och fritid?",
-    "Vet du vad organisationens mål är?",
-    "Känner du av grupptryck?",
-    "Förstår du varför förändringar sker?",
-    "Är du öppen för förändring?",
-    "Lär du dig gärna nya saker?",
-    "Använder du AI i ditt arbete?",
-    "Är det svårare med mänskliga problem än tekniska?",
-    "Följs problem upp systematiskt?",
-    "Känner du större lojalitet till kollegor än till ledning?",
-    "Blir du motiverad av att få göra skillnad?",
-    "Tappas din motivation när du blir störd?",
-    "Drivs du mer av utveckling än av pengar?",
-    "Hjälper du andra på jobbet?",
-    "Hjälper de dig tillbaka?",
-    "Har du några tankar efter intervjun?"
+    "Vad är din roll eller titel i organisationen?",
+    "Vad tycker du är det bästa med ditt jobb?",
+    "Vad tycker du är det svåraste med ditt jobb?",
+    "Hur ser du på ledarskapet i din organisation?",
+    "Känner du dig motiverad i ditt arbete?",
+    "Hur hanterar du stressiga situationer på jobbet?",
+    "Hur fungerar samarbetet med dina kollegor?",
+    "Vad skulle du vilja förändra på din arbetsplats?",
+    "Vad driver dig i ditt arbete – t.ex. utveckling, pengar, trygghet?",
+    "Har du några reflektioner efter intervjun?"
 ]
 
 question_index = 0
@@ -84,33 +67,16 @@ def chat():
             global interviewer_prompt, starter_questions
             interviewer_prompt = interviewer_prompt.replace("Du är", "You are").replace("Instruktioner:", "Instructions:").replace("Frågor", "Questions").replace("fråga", "question")
             starter_questions = [
-                "Do you have a title or role in your organization?",
-                "Do you have formal education?",
-                "Have you worked here for more than three years?",
-                "Did you apply for the job because it felt meaningful?",
-                "Is there someone you see as a role model?",
-                "Do you feel inspired in your work?",
-                "Does leadership affect how you work?",
-                "Is the leadership effective in your view?",
-                "Does the organization have a clear direction?",
-                "Do you feel heard by colleagues or management?",
-                "Is your responsibility clearly defined?",
-                "Can you balance work and free time?",
-                "Do you know what the organization's goals are?",
-                "Do you feel peer pressure?",
-                "Do you understand why changes happen?",
-                "Are you open to change?",
-                "Do you enjoy learning new things?",
-                "Do you use AI at work?",
-                "Are human problems harder to deal with than technical ones?",
-                "Are problems followed up systematically?",
-                "Are you more loyal to your colleagues than to leadership?",
-                "Are you motivated by making a difference?",
-                "Do you lose motivation when interrupted?",
-                "Are you driven more by growth than money?",
-                "Do you help others at work?",
-                "Do they help you back?",
-                "Do you have any reflections after this interview?"
+            "What is your role or title in your organization?",
+            "What do you like most about your job?",
+            "What do you find most challenging in your work?",
+            "How do you view the leadership in your organization?",
+            "Do you feel motivated in your work?",
+            "How do you handle stressful situations at work?",
+            "How would you describe collaboration with your colleagues?",
+            "What is one thing you would change at your workplace?",
+            "What drives you in your work – for example, growth, money, or stability?",
+            "Do you have any reflections after this interview?"    
             ]
             return jsonify({"response": "Thank you. The interview will continue in English.\n\n" + starter_questions[question_index]})
 
