@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
-from openai import OpenAI
 from flask_cors import CORS
-
+from openai import OpenAI
 import os
 import time
 
 app = Flask(__name__)
+CORS(app)
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 interviewer_prompt = """
