@@ -170,34 +170,26 @@ def generate_analysis():
     global latest_filename
     is_english = any(q.startswith("Do you") or q.startswith("Are") for q in starter_questions)
 
-    interview_text = "
-
-".join(interview_log).join(interview_log)
+    interview_text = "\n\n".join(interview_log)
 
     if is_english:
         prompt = (
-            "Based on the following interview answers, identify three strengths of the respondent, three areas for improvement, and suggest a suitable role within an organization.
-
-"
+            "Based on the following interview answers, identify three strengths of the respondent, "
+            "three areas for improvement, and suggest a suitable role within an organization.\n\n"
             + interview_text
         )
         system = "You are an expert in organizational psychology and recruitment."
         label = "[Analysis]"
-        intro = "The interview is now complete. Here is your analysis:
-
-"
+        intro = "The interview is now complete. Here is your analysis:\n\n"
     else:
         prompt = (
-            "Baserat på följande intervjusvar, identifiera tre styrkor hos respondenten, tre förbättringsområden, samt föreslå en lämplig roll inom en organisation.
-
-"
+            "Baserat på följande intervjusvar, identifiera tre styrkor hos respondenten, tre förbättringsområden, "
+            "samt föreslå en lämplig roll inom en organisation.\n\n"
             + interview_text
         )
         system = "Du är en expert på organisationspsykologi och rekrytering."
         label = "[Analys]"
-        intro = "Intervjun är nu avslutad. Här är din analys:
-
-"
+        intro = "Intervjun är nu avslutad. Här är din analys:\n\n"
 
     response = client.chat.completions.create(
         model="gpt-4",
@@ -209,15 +201,12 @@ def generate_analysis():
     final_output = response.choices[0].message.content
 
     with open(latest_filename, "a", encoding="utf-8") as log_file:
-        log_file.write(f"
-
-{label}
-")
+        log_file.write(f"\n\n{label}\n")
         log_file.write(final_output)
 
     return jsonify({"response": intro + final_output, "download": f"/download/{latest_filename}"})
 
-@app.route("/download/<filename>", methods=["GET"])
+app.route("/download/<filename>", methods=["GET"])
 def download_file(filename):
     return send_file(filename, as_attachment=True)
 
