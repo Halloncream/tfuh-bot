@@ -156,7 +156,8 @@ def chat():
             return generate_analysis()
         return jsonify({"response": reply + "\n\nNästa fråga: " + starter_questions[question_index]})
 
-    if "?" in reply:
+    import random
+    if "?" in reply and random.random() < 0.5:
         awaiting_followup = True
         return jsonify({"response": reply})
     else:
@@ -169,22 +170,56 @@ def generate_analysis():
     global latest_filename
     is_english = any(q.startswith("Do you") or q.startswith("Are") for q in starter_questions)
 
+    interview_text = "
+
+".join(interview_log)
+    reliability_prompt = (
+        "Skatta tillförlitligheten i det här intervjusvaret mellan 0.0 och 1.0 där 1.0 är mycket tillförlitlig och 0.0 mycket osäker. Baserat på detta, motivera värdet och ge tips på hur respondenten skulle kunna öka tillförlitligheten i sina svar om värdet är under 0.7.
+
+"
+        + interview_text
+    ) if not is_english else (
+        "Estimate the reliability of the following interview answers on a scale from 0.0 to 1.0, where 1.0 means very reliable and 0.0 very uncertain. Then motivate the score, and if below 0.7, suggest how the respondent could improve reliability in a future interview.
+
+"
+        + interview_text
+    )
+
+    reliability_system = "Du är expert på datakvalitet från kvalitativa intervjuer." if not is_english else "You are an expert on assessing the quality of qualitative interview data."
+
+    reliability_response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": reliability_system},
+            {"role": "user", "content": reliability_prompt}
+        ]
+    )
+    reliability_summary = reliability_response.choices[0].message.content
+
     if is_english:
         prompt = (
-            "Based on the following interview answers, identify three strengths of the respondent, three areas for improvement, and suggest a suitable role within an organization.\n\n"
-            + "\n\n".join(interview_log)
+            "Based on the following interview answers, identify three strengths of the respondent, three areas for improvement, and suggest a suitable role within an organization.
+
+"
+            + interview_text
         )
         system = "You are an expert in organizational psychology and recruitment."
         label = "[Analysis]"
-        intro = "The interview is now complete. Here is your analysis:\n\n"
+        intro = "The interview is now complete. Here is your analysis:
+
+"
     else:
         prompt = (
-            "Baserat på följande intervjusvar, identifiera tre styrkor hos respondenten, tre förbättringsområden, samt föreslå en lämplig roll inom en organisation.\n\n"
-            + "\n\n".join(interview_log)
+            "Baserat på följande intervjusvar, identifiera tre styrkor hos respondenten, tre förbättringsområden, samt föreslå en lämplig roll inom en organisation.
+
+"
+            + interview_text
         )
         system = "Du är en expert på organisationspsykologi och rekrytering."
         label = "[Analys]"
-        intro = "Intervjun är nu avslutad. Här är din analys:\n\n"
+        intro = "Intervjun är nu avslutad. Här är din analys:
+
+"
 
     response = client.chat.completions.create(
         model="gpt-4",
@@ -196,10 +231,20 @@ def generate_analysis():
     final_output = response.choices[0].message.content
 
     with open(latest_filename, "a", encoding="utf-8") as log_file:
-        log_file.write(f"\n\n{label}\n")
-        log_file.write(final_output)
+        log_file.write(f"
 
-    return jsonify({"response": intro + final_output, "download": f"/download/{latest_filename}"})
+{label}
+")
+        log_file.write(final_output)
+        log_file.write("
+
+[Tillförlitlighet / Reliability]
+")
+        log_file.write(reliability_summary)
+
+    return jsonify({"response": intro + final_output + "
+
+" + reliability_summary, "download": f"/download/{latest_filename}"})
 
 @app.route("/download/<filename>", methods=["GET"])
 def download_file(filename):
